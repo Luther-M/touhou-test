@@ -12,24 +12,29 @@ clock = py.time.Clock()
 
 (WHITE, BLACK, RED) = ((255, 255, 255), (0, 0, 0), (255, 0, 0))
 
+
+background =py.image.load('entity\\background.jpg')
+ship = py.image.load('entity\\ship.png').convert_alpha()
+rock = py.image.load('entity\\ship.png').convert_alpha()
+
+
 class render_entitiy:
     def __init__(self, input_position_x, input_position_y):
         self.object_position_x = input_position_x
         self.object_position_y = input_position_y
 
-    def render_square(self, input_length, input_height):
-        py.draw.rect(game_screen, BLACK, (self.object_position_x,
-                     self.object_position_y, input_length, input_height))
+    def render_ship(self, input_length, input_height):
+        game_screen.blit(py.transform.scale(ship,(input_length, input_height)), (self.object_position_x, self.object_position_y))
 
-    def render_circle(self, radius):
-        py.draw.circle(game_screen, BLACK, (self.object_position_x,
+    def render_rock(self, radius):
+        py.draw.circle(game_screen, WHITE, (self.object_position_x,
                        self.object_position_y), radius, 2)
 
 def render_laser(init_pos, end_pos):
     py.draw.line(game_screen, RED, init_pos, end_pos)
 
 def display_score(input):
-    text = font_arial.render(f"Score : {input}", True, BLACK, None)
+    text = font_arial.render(f"Score : {input}", True, WHITE, None)
     TextRect = text.get_rect()
     TextRect.center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
     game_screen.blit(text, TextRect)
@@ -46,7 +51,7 @@ def main():
     (circle_x_position, circle_y_position) = (
         ran.randint(circle_radius, SCREEN_WIDTH-circle_radius), 0)
     (down_velocity_circle, side_velocity_circle) = (
-        ran.randint(1, 3), ran.randint(-4, 4))
+        ran.randint(3, 6), ran.randint(-1, 1))
     
 
     score = 0
@@ -64,7 +69,7 @@ def main():
             (circle_x_position, circle_y_position) = (
                 ran.randint(circle_radius, SCREEN_WIDTH-circle_radius), 0)
 
-        game_screen.fill(WHITE)
+        game_screen.blit(background, (0,0))
 
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -94,7 +99,6 @@ def main():
                 if event.key == py.K_SPACE:
                     shoot = False
 
-
         sqaure_pos_x += (right_velocity - left_velocity)
         square_pos_y += (down_velocity - up_velocity)
 
@@ -111,7 +115,7 @@ def main():
         box = render_entitiy(
             sqaure_pos_x, square_pos_y)
         circle = render_entitiy(circle_x_position, circle_y_position)
-        box.render_square(square_length, square_height)
+        box.render_ship(square_length, square_height)
 
         (circle_hitbox_left,circle_hitbox_right) = (circle_x_position - circle_radius,circle_x_position + circle_radius)
 
@@ -124,7 +128,7 @@ def main():
         display_score(str(score))
 
         if not destroy:
-            circle.render_circle(circle_radius)
+            circle.render_rock(circle_radius)
 
         py.display.flip()
         clock.tick(30)
